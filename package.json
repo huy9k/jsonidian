@@ -1,0 +1,67 @@
+{
+  "name": "jsonidian",
+  "version": "0.1.1",
+  "description": "Compile an Obsidian vault into static JSON + assets for SSG consumers",
+  "type": "module",
+  "license": "MIT",
+  "author": "Huy Pham",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huy9k/jsonidian.git"
+  },
+  "keywords": [
+    "obsidian",
+    "markdown",
+    "json",
+    "ssg",
+    "wikilink",
+    "digital-garden",
+    "cms"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "jsonidian": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "globby": "^14.1.0",
+    "gray-matter": "^4.0.3",
+    "hast-util-to-text": "^4.0.2",
+    "mdian": "^0.3.7",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/hast": "^3.0.4",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^22.15.21",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  }
+}
