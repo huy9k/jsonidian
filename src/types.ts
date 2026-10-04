@@ -35,8 +35,9 @@ export type GraphNode = {
   degree: number;
 };
 
-/** One undirected link between two notes, by slug. */
-export type GraphEdge = { source: string; target: string };
+/** One link between two notes, by slug. `source` links to `target`; `mutual`
+ *  marks a reciprocal pair (both directions exist). */
+export type GraphEdge = { source: string; target: string; mutual: boolean };
 
 /** The vault-wide link graph, emitted as `_graph.json`. */
 export type GraphJson = {

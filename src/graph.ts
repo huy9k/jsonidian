@@ -20,14 +20,31 @@ function edgeKey(a: string, b: string): string {
   return a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`;
 }
 
+/** Directed key, so a one-way link keeps the direction it was written. */
+function directedKey(from: string, to: string): string {
+  return `${from}\u0000${to}`;
+}
+
 /**
  * Derive the vault-wide link graph from every published page's outgoing links.
- * Edges are undirected and deduped; a self-link or a link to an unpublished
- * note (no node to land on) is dropped. Backlinks need no pass — a consumer
- * inverts `edges` once for both directions of a local-graph walk.
+ * Edges are deduped, but directed: `source` links to `target`, and `mutual`
+ * marks a pair linked both ways, so a consumer can draw a true arrowhead. A
+ * self-link or a link to an unpublished note (no node to land on) is dropped.
+ * Degree stays undirected, and backlinks need no pass — a consumer inverts
+ * `edges` once for both directions of a local-graph walk.
  */
 export function buildGraph(pages: PageJson[]): GraphJson {
   const slugs = new Set(pages.map((page) => page.slug));
+
+  // Every real direction, collected first so `mutual` can be decided per edge.
+  const directed = new Set<string>();
+  for (const page of pages) {
+    for (const target of page.links) {
+      if (target === page.slug || !slugs.has(target)) continue;
+      directed.add(directedKey(page.slug, target));
+    }
+  }
+
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
 
@@ -37,7 +54,11 @@ export function buildGraph(pages: PageJson[]): GraphJson {
       const key = edgeKey(page.slug, target);
       if (seen.has(key)) continue;
       seen.add(key);
-      edges.push({ source: page.slug, target });
+      edges.push({
+        source: page.slug,
+        target,
+        mutual: directed.has(directedKey(target, page.slug)),
+      });
     }
   }
 

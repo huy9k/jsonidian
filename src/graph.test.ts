@@ -21,14 +21,19 @@ function page(
 }
 
 describe("buildGraph", () => {
-  it("dedupes reciprocal links into one undirected edge", () => {
+  it("dedupes reciprocal links into one mutual edge", () => {
     const graph = buildGraph([page("a", ["b"]), page("b", ["a"])]);
-    expect(graph.edges).toEqual([{ source: "a", target: "b" }]);
+    expect(graph.edges).toEqual([{ source: "a", target: "b", mutual: true }]);
+  });
+
+  it("keeps a one-way link's direction", () => {
+    const graph = buildGraph([page("b", ["a"]), page("a", [])]);
+    expect(graph.edges).toEqual([{ source: "b", target: "a", mutual: false }]);
   });
 
   it("drops self-links and links to unpublished notes", () => {
     const graph = buildGraph([page("a", ["a", "ghost", "b"]), page("b", [])]);
-    expect(graph.edges).toEqual([{ source: "a", target: "b" }]);
+    expect(graph.edges).toEqual([{ source: "a", target: "b", mutual: false }]);
   });
 
   it("counts each node's degree over the undirected edges", () => {

@@ -66,11 +66,11 @@ type IndexEntry = { slug: string; frontmatter: Record<string, unknown> };
 ```ts
 type GraphJson = {
   nodes: { slug: string; title: string; tags: string[]; degree: number }[];
-  edges: { source: string; target: string }[]; // undirected, deduped
+  edges: { source: string; target: string; mutual: boolean }[]; // deduped, directed
 };
 ```
 
-One file for the whole vault: nodes are every published page (title falls back to the slug), edges are every wikilink joined by slug. Self-links and links to unpublished notes are dropped; `degree` is precomputed. Underscored so it never collides with a note whose slug is `graph`. Backlinks need no field — invert `edges` once for both directions of a local-graph walk.
+One file for the whole vault: nodes are every published page (title falls back to the slug), edges are every wikilink joined by slug. Edges are deduped but **directed** — `source` links to `target`, and `mutual` is `true` when the pair is linked both ways — so a consumer can draw a true arrowhead (`source → target`, or both heads when mutual). Self-links and links to unpublished notes are dropped; `degree` is precomputed and stays undirected. Underscored so it never collides with a note whose slug is `graph`. Backlinks need no field — invert `edges` once for both directions of a local-graph walk.
 
 **Assets** — `content/assets/**` copied to `{out}/assets/**`. Image `src` and common cover frontmatter fields are rewritten with `assetBaseUrl`.
 
