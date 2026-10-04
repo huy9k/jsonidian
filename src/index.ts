@@ -4,6 +4,7 @@ import type { BuildOptions, BuildResult, PageJson } from "./types.js";
 import { scanMarkdownFiles, resolveIgnore } from "./scan.js";
 import { defaultPublish, parseNoteFile } from "./parse.js";
 import { buildSlugIndex, buildAssetIndex } from "./resolve.js";
+import { buildGraph } from "./graph.js";
 import { expandNoteEmbeds } from "./embeds.js";
 import {
   markdownToHast,
@@ -17,6 +18,7 @@ import {
   prepareOutDir,
   writePageJson,
   writeFolderIndexes,
+  writeGraphJson,
   copyAssets,
 } from "./emit.js";
 
@@ -27,6 +29,9 @@ export type {
   IndexEntry,
   TocEntry,
   PublishPredicate,
+  GraphJson,
+  GraphNode,
+  GraphEdge,
 } from "./types.js";
 
 /**
@@ -105,11 +110,14 @@ export async function build(opts: BuildOptions): Promise<BuildResult> {
   }
 
   const indexes = await writeFolderIndexes(outDir, pages);
+  const graph = buildGraph(pages);
+  await writeGraphJson(outDir, graph);
   const assets = await copyAssets(contentDir, outDir, assetPosix);
 
   return {
     pages: pages.length,
     indexes,
+    graph: { nodes: graph.nodes.length, edges: graph.edges.length },
     assets,
     outDir,
   };

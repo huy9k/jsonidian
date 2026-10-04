@@ -28,7 +28,7 @@ cli
         embedDepth: Number(options.embedDepth) || 3,
       });
       console.log(
-        `jsonidian: wrote ${result.pages} pages, ${result.indexes} indexes, ${result.assets} assets → ${result.outDir}`,
+        `jsonidian: wrote ${result.pages} pages, ${result.indexes} indexes, ${result.graph.nodes} nodes / ${result.graph.edges} edges, ${result.assets} assets → ${result.outDir}`,
       );
     },
   );

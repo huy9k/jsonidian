@@ -61,6 +61,17 @@ type IndexEntry = { slug: string; frontmatter: Record<string, unknown> };
 
 `blog/index.md` collapses to slug `blog` → `blog.json` (page body). Sibling posts are listed in `blog/index.json`.
 
+**Graph** — `_graph.json`
+
+```ts
+type GraphJson = {
+  nodes: { slug: string; title: string; tags: string[]; degree: number }[];
+  edges: { source: string; target: string }[]; // undirected, deduped
+};
+```
+
+One file for the whole vault: nodes are every published page (title falls back to the slug), edges are every wikilink joined by slug. Self-links and links to unpublished notes are dropped; `degree` is precomputed. Underscored so it never collides with a note whose slug is `graph`. Backlinks need no field — invert `edges` once for both directions of a local-graph walk.
+
 **Assets** — `content/assets/**` copied to `{out}/assets/**`. Image `src` and common cover frontmatter fields are rewritten with `assetBaseUrl`.
 
 **Publish filter** — skips `draft: true` and `is_published: false`.

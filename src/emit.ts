@@ -1,6 +1,6 @@
 import path from "node:path";
 import fs from "node:fs/promises";
-import type { IndexEntry, PageJson } from "./types.js";
+import type { GraphJson, IndexEntry, PageJson } from "./types.js";
 
 /**
  * Write a page JSON file at outDir/{slug}.json
@@ -50,6 +50,18 @@ export async function writeFolderIndexes(
     count += 1;
   }
   return count;
+}
+
+/**
+ * Write the vault-wide link graph. `_graph.json` (underscored) so it never
+ * collides with a note whose slug is `graph`.
+ */
+export async function writeGraphJson(
+  outDir: string,
+  graph: GraphJson,
+): Promise<void> {
+  const filePath = path.join(outDir, "_graph.json");
+  await fs.writeFile(filePath, JSON.stringify(graph), "utf8");
 }
 
 /**

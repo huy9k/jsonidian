@@ -26,6 +26,24 @@ export type IndexEntry = {
   frontmatter: Record<string, unknown>;
 };
 
+/** One node in the vault-wide link graph. */
+export type GraphNode = {
+  slug: string;
+  title: string;
+  tags: string[];
+  /** Undirected link count, precomputed so a consumer never recounts. */
+  degree: number;
+};
+
+/** One undirected link between two notes, by slug. */
+export type GraphEdge = { source: string; target: string };
+
+/** The vault-wide link graph, emitted as `_graph.json`. */
+export type GraphJson = {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+};
+
 /** A parsed note, before its markdown is rendered to HAST. */
 export type ParsedNote = {
   absolutePath: string;
@@ -66,6 +84,7 @@ export type BuildOptions = {
 export type BuildResult = {
   pages: number;
   indexes: number;
+  graph: { nodes: number; edges: number };
   assets: number;
   outDir: string;
 };
