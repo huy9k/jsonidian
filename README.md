@@ -80,6 +80,7 @@ One file for the whole vault: nodes are every published page (title falls back t
 
 - Wikilinks `[[note]]` / `[[note|alias]]` (shortest-path resolution)
 - Image embeds `![[image.webp|400]]`
+- Markdown image sizing `![alt|400](url)` / `![alt|300x200](url)` → `width`/`height`
 - Note embeds `![[other-note]]` (inlined at build)
 - GFM (tables, strikethrough, task lists, …)
 - Callouts / highlights / comments via [mdian](https://github.com/ngtrio/mdian)

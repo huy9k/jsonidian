@@ -82,8 +82,36 @@ export async function markdownToHast(
 
   const mdast = processor.parse(markdown);
   const tree = (await processor.run(mdast)) as HastRoot;
+  applyImageSizes(tree);
   normalizeInternalLinks(tree);
   return tree;
+}
+
+/** Trailing `|WIDTH` or `|WIDTHxHEIGHT` segment, matching OFM embed sizing. */
+const IMAGE_SIZE_SEGMENT_RE = /^(\d+)(?:x(\d+))?$/;
+
+/**
+ * Hoist an Obsidian-style `|WIDTH` / `|WIDTHxHEIGHT` suffix out of a standard
+ * Markdown image alt into `width`/`height`, so `![alt|500](url)` sizes the same
+ * as the `![[image|500]]` embed form that `mdian` already handles.
+ */
+export function applyImageSizes(tree: HastRoot): void {
+  visit(tree, "element", (node: Element) => {
+    if (node.tagName !== "img") return;
+    const props = node.properties ?? {};
+    const alt = typeof props.alt === "string" ? props.alt : "";
+    const segments = alt.split("|");
+    if (segments.length < 2) return;
+    const match = IMAGE_SIZE_SEGMENT_RE.exec(segments[segments.length - 1] ?? "");
+    if (!match) return;
+
+    const alias = segments.slice(0, -1).join("|");
+    props.width = Number(match[1]);
+    if (match[2] !== undefined) props.height = Number(match[2]);
+    if (alias) props.alt = alias;
+    else delete props.alt;
+    node.properties = props;
+  });
 }
 
 /**

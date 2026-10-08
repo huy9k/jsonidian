@@ -52,3 +52,42 @@ describe("absolutizeImages", () => {
     expect(rawHtml(tree)).toContain('src="assets/images/missing.webp"');
   });
 });
+
+/** First `<img>` element's properties in the tree. */
+function firstImg(tree: Root) {
+  let props: Record<string, unknown> | undefined;
+  visit(tree, "element", (node) => {
+    if (node.tagName === "img") props ??= node.properties ?? {};
+  });
+  return props;
+}
+
+describe("applyImageSizes", () => {
+  it("hoists a numeric alt suffix into width, on a remote src", async () => {
+    const tree = await render("![a special seat|500](https://img.example.com/seat.webp)");
+    const props = firstImg(tree);
+    expect(props?.width).toBe(500);
+    expect(props?.alt).toBe("a special seat");
+  });
+
+  it("supports a WIDTHxHEIGHT suffix", async () => {
+    const tree = await render("![pic|300x200](assets/images/pic.webp)");
+    const props = firstImg(tree);
+    expect(props?.width).toBe(300);
+    expect(props?.height).toBe(200);
+  });
+
+  it("leaves a non-numeric pipe in the alt untouched", async () => {
+    const tree = await render("![a|b](assets/images/pic.webp)");
+    const props = firstImg(tree);
+    expect(props?.width).toBeUndefined();
+    expect(props?.alt).toBe("a|b");
+  });
+
+  it("leaves a plain image untouched", async () => {
+    const tree = await render("![plain](assets/images/pic.webp)");
+    const props = firstImg(tree);
+    expect(props?.width).toBeUndefined();
+    expect(props?.alt).toBe("plain");
+  });
+});

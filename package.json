@@ -1,6 +1,6 @@
 {
   "name": "jsonidian",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Compile an Obsidian vault into static JSON + assets for SSG consumers",
   "type": "module",
   "license": "MIT",
